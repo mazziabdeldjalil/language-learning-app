@@ -1,0 +1,20 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+.packages
+pubspec.lock
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.xcworkspace/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local deployment
+.env
