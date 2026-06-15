@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "416381337314",
+    "project_id": "fluentydz",
+    "storage_bucket": "fluentydz.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:416381337314:android:ffcfa7befd937dc731a8bb",
+        "android_client_info": {
+          "package_name": "com.example.language_learning_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_b_5iMMVUf1_xftr7Qv4WUDFj6bqLnaM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

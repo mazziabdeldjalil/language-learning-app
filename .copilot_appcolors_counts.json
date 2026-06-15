@@ -1,0 +1,94 @@
+﻿[
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\core\\backend.dart",
+        "Count":  0
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\core\\supabase_config.dart",
+        "Count":  0
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\core\\supabase_service.dart",
+        "Count":  0
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\data\\learn_content.dart",
+        "Count":  0
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\main.dart",
+        "Count":  0
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\admin_screen.dart",
+        "Count":  0
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\chat_screen.dart",
+        "Count":  43
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\community_screen.dart",
+        "Count":  0
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\difficulty_selection_screen.dart",
+        "Count":  0
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\exercises_screen.dart",
+        "Count":  103
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Count":  53
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\index.dart",
+        "Count":  0
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\learn_screen.dart",
+        "Count":  60
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\login_screen.dart",
+        "Count":  20
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Count":  65
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\pronunciation_screen.dart",
+        "Count":  13
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\register_screen.dart",
+        "Count":  17
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\scenario_selection_screen.dart",
+        "Count":  0
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Count":  26
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\username_screen.dart",
+        "Count":  0
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\services\\gcp_tts_service.dart",
+        "Count":  0
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\services\\stt_service.dart",
+        "Count":  0
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\theme\\app_theme.dart",
+        "Count":  21
+    }
+]

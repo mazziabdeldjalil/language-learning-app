@@ -1,0 +1,979 @@
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:language_learning_app/core/backend.dart';
+import 'package:language_learning_app/services/stt_service.dart';
+import '../providers/theme_provider.dart';
+import 'summary_screen.dart';
+
+class ChatScreen extends StatefulWidget {
+  const ChatScreen({super.key});
+
+  @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  late TextEditingController _messageController;
+  late ScrollController _scrollController;
+  late STTService _sttService;
+  bool _isListening = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _messageController = TextEditingController();
+    _scrollController = ScrollController();
+    _sttService = STTService();
+    _sttService.initialize().then((_) {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  Future<void> _endSession(BuildContext context) async {
+    final provider = Provider.of<ChatProvider>(context, listen: false);
+    await provider.stopTts();
+    final summary = await provider.endSession();
+    if (summary != null && mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => SummaryScreen(summary: summary)),
+      );
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not generate summary. Try again.')),
+      );
+    }
+  }
+
+  void _sendMessage(BuildContext context) {
+    final message = _messageController.text.trim();
+    if (message.isEmpty) return;
+    _messageController.clear();
+    context.read<ChatProvider>().sendMessage(message);
+    _scrollToBottom();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    return WillPopScope(
+      onWillPop: () async {
+        context.read<ChatProvider>().resetConversation();
+        Navigator.pushNamedAndRemoveUntil(
+          context, '/scenario', (route) => false,
+        );
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFF131313),
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: const AssetImage('assets/images/practice.png'),
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(
+                Colors.black.withOpacity(0.78),
+                BlendMode.darken,
+              ),
+            ),
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                // Top Bar
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF121212).withOpacity(0.8),
+                    border: const Border(
+                        bottom: BorderSide(color: Color(0x1AFFFFFF))),
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: () {
+                          context.read<ChatProvider>().resetConversation();
+                          Navigator.pushNamedAndRemoveUntil(
+                            context, '/scenario', (route) => false,
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(child: _buildAppBarTitle(context, themeProvider)),
+                      // TTS toggle
+                      Consumer<ChatProvider>(
+                        builder: (context, chatProvider, _) => IconButton(
+                          icon: Icon(
+                            chatProvider.ttsEnabled
+                                ? Icons.volume_up
+                                : Icons.volume_off,
+                            color: chatProvider.ttsEnabled
+                                ? themeProvider.primaryColor
+                                : Colors.white38,
+                            size: 22,
+                          ),
+                          onPressed: () =>
+                              chatProvider.setTTSEnabled(!chatProvider.ttsEnabled),
+                        ),
+                      ),
+                      // End Session button
+                      Consumer<ChatProvider>(
+                        builder: (context, provider, _) => GestureDetector(
+                          onTap: provider.isEndingSession
+                              ? null
+                              : () => _endSession(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF2A2A2A),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                  color: Colors.white.withOpacity(0.1)),
+                            ),
+                            child: provider.isEndingSession
+                                ? const SizedBox(
+                                    width: 14,
+                                    height: 14,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2, color: Colors.white),
+                                  )
+                                : const Text('End Session',
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                    ],
+                  ),
+                ),
+
+                // Difficulty chip row
+                Consumer<ChatProvider>(
+                  builder: (context, chatProvider, _) {
+                    final difficulty = chatProvider.selectedDifficulty;
+                    if (difficulty == null) {
+                      return const SizedBox.shrink();
+                    }
+
+                    final diffColor = _getDifficultyColor(difficulty.name);
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 8),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: diffColor.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  _getDifficultyIcon(difficulty.name),
+                                  size: 13,
+                                  color: diffColor,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  difficulty.name,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: diffColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+
+                // Practice hero card
+                Consumer<ChatProvider>(
+                  builder: (context, chatProvider, _) {
+                    String highlightedMessage =
+                        'Start the conversation and I will coach you in real time.';
+                    for (final message
+                        in chatProvider.messageHistory.reversed) {
+                      if (message.role != 'user') {
+                        highlightedMessage = message.content;
+                        break;
+                      }
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 2, 20, 10),
+                      child: Column(
+                        children: [
+                          Stack(
+                            children: [
+                              Container(
+                                width: 78,
+                                height: 78,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: themeProvider.primaryColor,
+                                    width: 2,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: themeProvider.primaryColor
+                                          .withOpacity(0.28),
+                                      blurRadius: 18,
+                                    ),
+                                  ],
+                                ),
+                                child: const ClipOval(
+                                  child: Icon(
+                                    Icons.smart_toy,
+                                    size: 42,
+                                    color: Color(0xFFE5E2E1),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                right: -2,
+                                bottom: -2,
+                                child: Container(
+                                  width: 28,
+                                  height: 28,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFFF8A00),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.volume_up,
+                                    color: Color(0xFF613100),
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                              child: Container(
+                                width: double.infinity,
+                                constraints: const BoxConstraints(maxWidth: 580),
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.04),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: themeProvider.primaryColor
+                                        .withOpacity(0.2),
+                                  ),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      highlightedMessage,
+                                      textAlign: TextAlign.center,
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        _buildContextChip(
+                                          text: chatProvider
+                                                  .selectedDifficulty?.name ??
+                                              'Practice',
+                                          color: _getDifficultyColor(
+                                            chatProvider
+                                                    .selectedDifficulty?.name ??
+                                                '',
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        _buildContextChip(
+                                          text: 'AI Mentor',
+                                          color: themeProvider.primaryColor,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+
+                // Messages list
+                Expanded(
+                  child: Consumer<ChatProvider>(
+                    builder: (context, chatProvider, _) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _scrollToBottom();
+                      });
+
+                      if (chatProvider.messageHistory.isEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.chat_bubble_outline,
+                                  size: 64,
+                                  color: Colors.white.withOpacity(0.2)),
+                              const SizedBox(height: 16),
+                              const Text('Start a conversation!',
+                                  style: TextStyle(
+                                      color: Color(0xFFDDC1AE), fontSize: 16)),
+                            ],
+                          ),
+                        );
+                      }
+
+                      return ListView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.all(16),
+                        itemCount: chatProvider.messageHistory.length +
+                            (chatProvider.isLoading ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          // Loading bubble
+                          if (index == chatProvider.messageHistory.length) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: BackdropFilter(
+                                      filter: ImageFilter.blur(
+                                          sigmaX: 12, sigmaY: 12),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(14),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.05),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          border: Border.all(
+                                              color: Colors.white
+                                                  .withOpacity(0.1)),
+                                        ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            _AnimatedDot(delay: 0),
+                                            _AnimatedDot(delay: 200),
+                                            _AnimatedDot(delay: 400),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
+                          final message = chatProvider.messageHistory[index];
+                          final isUser = message.role == 'user';
+
+                          return Column(
+                            children: [
+                              // Message bubble
+                              Align(
+                                alignment: isUser
+                                    ? Alignment.centerRight
+                                    : Alignment.centerLeft,
+                                child: Column(
+                                  crossAxisAlignment: isUser
+                                      ? CrossAxisAlignment.end
+                                      : CrossAxisAlignment.start,
+                                  children: [
+                                    if (!isUser)
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 4, bottom: 4),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.auto_awesome,
+                                                color:
+                                                    themeProvider.primaryColor,
+                                                size: 12),
+                                            const SizedBox(width: 4),
+                                            Text('AI TEACHER',
+                                                style: TextStyle(
+                                                    color: themeProvider
+                                                        .primaryColor,
+                                                    fontSize: 10,
+                                                    letterSpacing: 1,
+                                                    fontWeight:
+                                                        FontWeight.w600)),
+                                          ],
+                                        ),
+                                      ),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.only(
+                                            topLeft:
+                                                const Radius.circular(16),
+                                            topRight:
+                                                const Radius.circular(16),
+                                            bottomLeft: Radius.circular(
+                                                isUser ? 16 : 0),
+                                            bottomRight: Radius.circular(
+                                                isUser ? 0 : 16),
+                                          ),
+                                          child: BackdropFilter(
+                                            filter: ImageFilter.blur(
+                                                sigmaX: 12, sigmaY: 12),
+                                            child: Container(
+                                              constraints: BoxConstraints(
+                                                maxWidth:
+                                                    MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.72,
+                                              ),
+                                              margin: const EdgeInsets.symmetric(
+                                                  vertical: 6),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 16,
+                                                      vertical: 12),
+                                              decoration: BoxDecoration(
+                                                color: isUser
+                                                    ? themeProvider.primaryColor
+                                                        .withOpacity(0.2)
+                                                    : Colors.white
+                                                        .withOpacity(0.05),
+                                                border: Border.all(
+                                                  color: isUser
+                                                      ? themeProvider
+                                                          .primaryColor
+                                                          .withOpacity(0.4)
+                                                      : Colors.white
+                                                          .withOpacity(0.1),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                message.content,
+                                                style: TextStyle(
+                                                  color: isUser
+                                                      ? Colors.white
+                                                      : const Color(
+                                                          0xFFE5E2E1),
+                                                  fontSize: 15,
+                                                  height: 1.4,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        if (!isUser)
+                                          Consumer<ChatProvider>(
+                                            builder:
+                                                (context, chatProvider, _) =>
+                                                    IconButton(
+                                              icon: Icon(Icons.volume_up,
+                                                  size: 18,
+                                                  color: themeProvider
+                                                      .primaryColor),
+                                              onPressed: () =>
+                                                  chatProvider.replayText(
+                                                message.content,
+                                                emotion:
+                                                    message.speechEmotion,
+                                                pace: message.speechPace,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              // Pronunciation tip below user message
+                              if (isUser)
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: _buildPronunciationTip(
+                                    PronunciationHelper.checkMessage(
+                                        message.content),
+                                    themeProvider,
+                                  ),
+                                ),
+
+                              // Grammar corrections
+                              if (!isUser &&
+                                  index ==
+                                      chatProvider.messageHistory.length -
+                                          1 &&
+                                  chatProvider.currentCorrections != null &&
+                                  chatProvider.currentCorrections!.isNotEmpty)
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                    constraints: BoxConstraints(
+                                      maxWidth: MediaQuery.of(context)
+                                              .size
+                                              .width *
+                                          0.75,
+                                    ),
+                                    margin: const EdgeInsets.only(
+                                        top: 6, bottom: 10),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF3131C0)
+                                          .withOpacity(0.1),
+                                      border: Border.all(
+                                          color: const Color(0xFF3131C0)
+                                              .withOpacity(0.3)),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.auto_fix_high,
+                                                color: Color(0xFFC0C1FF),
+                                                size: 14),
+                                            SizedBox(width: 6),
+                                            Text('Grammar Note',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Color(0xFFC0C1FF),
+                                                    fontSize: 12)),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          chatProvider.currentCorrections!,
+                                          style: const TextStyle(
+                                              color: Color(0xFFDDC1AE),
+                                              fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+
+                // Error message
+                Consumer<ChatProvider>(
+                  builder: (context, chatProvider, _) {
+                    if (chatProvider.errorMessage == null) {
+                      return const SizedBox.shrink();
+                    }
+                    return Container(
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEF5350).withOpacity(0.1),
+                        border: Border.all(
+                            color: const Color(0xFFEF5350).withOpacity(0.4)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.error_outline,
+                              color: Color(0xFFEF5350), size: 20),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(chatProvider.errorMessage!,
+                                style: const TextStyle(
+                                    color: Color(0xFFEF5350))),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+
+                // Input bar
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF121212).withOpacity(0.9),
+                    border: const Border(
+                        top: BorderSide(color: Color(0x1AFFFFFF))),
+                  ),
+                  child: Row(
+                    children: [
+                      // Mic button
+                      GestureDetector(
+                        onTap: () async {
+                          if (_isListening) {
+                            await _sttService.stop();
+                            setState(() => _isListening = false);
+                            return;
+                          }
+                          await Provider.of<ChatProvider>(context,
+                                  listen: false)
+                              .stopTts();
+                          setState(() => _isListening = true);
+                          await _sttService.listen((text, isFinal) async {
+                            setState(() {
+                              _messageController.text = text;
+                            });
+                            if (isFinal) {
+                              setState(() => _isListening = false);
+                              await _sttService.stop();
+                              final msg = text.trim();
+                              if (msg.isNotEmpty) {
+                                _messageController.clear();
+                                context.read<ChatProvider>().sendMessage(msg);
+                                _scrollToBottom();
+                              }
+                            }
+                          });
+                        },
+                        child: Consumer<ThemeProvider>(
+                          builder: (context, tp, _) => Container(
+                            width: 46,
+                            height: 46,
+                            decoration: BoxDecoration(
+                              color: _isListening
+                                  ? tp.primaryColor
+                                  : Colors.white.withOpacity(0.05),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                  color: _isListening
+                                      ? tp.primaryColor
+                                      : Colors.white.withOpacity(0.1)),
+                            ),
+                            child: Icon(
+                              _isListening ? Icons.mic : Icons.mic_none,
+                              color: _isListening
+                                  ? const Color(0xFF613100)
+                                  : Colors.white54,
+                              size: 22,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+
+                      // Text input
+                      Expanded(
+                        child: Consumer<ThemeProvider>(
+                          builder: (context, tp, _) => Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0A0A0A),
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(
+                                  color: tp.primaryColor.withOpacity(0.3)),
+                            ),
+                            child: TextField(
+                              controller: _messageController,
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 14),
+                              decoration: const InputDecoration(
+                                hintText: 'Type your message...',
+                                hintStyle: TextStyle(color: Colors.white24),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                              ),
+                              maxLines: null,
+                              textInputAction: TextInputAction.send,
+                              onSubmitted: (_) => _sendMessage(context),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+
+                      // Send button
+                      Consumer<ChatProvider>(
+                        builder: (context, chatProvider, _) =>
+                            Consumer<ThemeProvider>(
+                          builder: (context, tp, _) => GestureDetector(
+                            onTap: chatProvider.isLoading
+                                ? null
+                                : () => _sendMessage(context),
+                            child: Container(
+                              width: 46,
+                              height: 46,
+                              decoration: BoxDecoration(
+                                color: chatProvider.isLoading
+                                    ? Colors.white.withOpacity(0.1)
+                                    : tp.primaryColor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: chatProvider.isLoading
+                                  ? const Center(
+                                      child: SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white),
+                                      ),
+                                    )
+                                  : const Icon(Icons.send,
+                                      color: Color(0xFF613100), size: 20),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppBarTitle(BuildContext context, ThemeProvider themeProvider) {
+    return Consumer<ChatProvider>(
+      builder: (context, chatProvider, _) {
+        final scenario = chatProvider.selectedScenario;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              scenario?.name ?? 'Chat',
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 15),
+            ),
+            Text(
+              _getSessionObjective(scenario?.name),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Color(0xFFDDC1AE),
+                fontSize: 10,
+                letterSpacing: 0.5,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  String _getSessionObjective(String? scenarioName) {
+    if (scenarioName == null || scenarioName.isEmpty) {
+      return 'SESSION OBJECTIVE: CONVERSATION PRACTICE';
+    }
+
+    return 'SESSION OBJECTIVE: ${scenarioName.toUpperCase()}';
+  }
+
+  Color _getDifficultyColor(String name) {
+    switch (name.toLowerCase()) {
+      case 'beginner':
+        return const Color(0xFF2ECC71);
+      case 'intermediate':
+        return const Color(0xFFFF8A00);
+      case 'advanced':
+        return const Color(0xFFEF5350);
+      default:
+        return const Color(0xFF88CEFF);
+    }
+  }
+
+  IconData _getDifficultyIcon(String name) {
+    switch (name.toLowerCase()) {
+      case 'beginner':
+        return Icons.eco;
+      case 'intermediate':
+        return Icons.trending_up;
+      case 'advanced':
+        return Icons.rocket;
+      default:
+        return Icons.star;
+    }
+  }
+
+  Widget _buildContextChip({required String text, required Color color}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.18),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPronunciationTip(
+      List<Map<String, String>> tips, ThemeProvider themeProvider) {
+    if (tips.isEmpty) return const SizedBox.shrink();
+    return Container(
+      margin: const EdgeInsets.only(top: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF9B59B6).withOpacity(0.1),
+        border:
+            Border.all(color: const Color(0xFF9B59B6).withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: tips.map((tip) {
+          final word = tip['word'] ?? '';
+          final phonetic = tip['phonetic'] ?? '';
+          final tipText = tip['tip'] ?? '';
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.record_voice_over,
+                    size: 14, color: Color(0xFFC0C1FF)),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: '$word ',
+                          style: const TextStyle(
+                              color: Color(0xFFC0C1FF),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12),
+                        ),
+                        TextSpan(
+                          text: '$phonetic  •  ',
+                          style: const TextStyle(
+                              color: Color(0xFFDDC1AE),
+                              fontStyle: FontStyle.italic,
+                              fontSize: 12),
+                        ),
+                        TextSpan(
+                          text: tipText,
+                          style: const TextStyle(
+                              color: Color(0xFFDDC1AE), fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+class _AnimatedDot extends StatefulWidget {
+  final int delay;
+  const _AnimatedDot({required this.delay});
+
+  @override
+  State<_AnimatedDot> createState() => _AnimatedDotState();
+}
+
+class _AnimatedDotState extends State<_AnimatedDot>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+        duration: const Duration(milliseconds: 600), vsync: this);
+    _anim = Tween<double>(begin: 0.3, end: 1.0)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+    Future.delayed(Duration(milliseconds: widget.delay), () {
+      if (mounted) _ctrl.repeat(reverse: true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _anim,
+      builder: (context, child) => Container(
+        width: 6,
+        height: 6,
+        margin: const EdgeInsets.symmetric(horizontal: 2),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(_anim.value),
+          shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
+}
+

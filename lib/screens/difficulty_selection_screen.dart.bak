@@ -1,0 +1,303 @@
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:language_learning_app/core/backend.dart';
+import '../providers/theme_provider.dart';
+
+class DifficultySelectionScreen extends StatelessWidget {
+  const DifficultySelectionScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF131313),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/scenario.png'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(Color(0xBF000000), BlendMode.darken),
+          ),
+        ),
+        child: SafeArea(
+          child: Consumer<ChatProvider>(
+            builder: (context, chatProvider, _) {
+              final scenario = chatProvider.selectedScenario;
+
+              if (scenario == null) {
+                return const Center(
+                  child: Text('Please select a scenario first',
+                      style: TextStyle(color: Colors.white)),
+                );
+              }
+
+              return Column(
+                children: [
+                  // Top bar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back, color: Colors.white),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'SCT',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                            color: themeProvider.primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Select Difficulty',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            'Choose your level to get the right challenge.',
+                            style: TextStyle(
+                                fontSize: 14, color: Color(0xFFDDC1AE)),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Selected scenario chip
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.05),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(
+                                    color: themeProvider.primaryColor
+                                        .withOpacity(0.3),
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(scenario.icon,
+                                        color: themeProvider.primaryColor,
+                                        size: 28),
+                                    const SizedBox(width: 12),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text('Selected Scenario',
+                                            style: TextStyle(
+                                                fontSize: 11,
+                                                color: Color(0xFFDDC1AE))),
+                                        Text(
+                                          scenario.name,
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Difficulty options
+                          ...[
+                            Difficulty.beginner,
+                            Difficulty.intermediate,
+                            Difficulty.advanced
+                          ].map((difficulty) =>
+                              _DifficultyOption(difficulty: difficulty)),
+
+                          const SizedBox(height: 24),
+
+                          // Start Chat Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: chatProvider.selectedDifficulty != null
+                                  ? () => Navigator.pushNamed(context, '/chat')
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: themeProvider.primaryColor,
+                                foregroundColor: const Color(0xFF2F1500),
+                                disabledBackgroundColor:
+                                    Colors.white.withOpacity(0.1),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 18),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.play_circle_fill, size: 24),
+                                  SizedBox(width: 10),
+                                  Text('Start Chat',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.5)),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 30),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DifficultyOption extends StatelessWidget {
+  final Difficulty difficulty;
+  const _DifficultyOption({required this.difficulty});
+
+  Color _getLevelColor(String name) {
+    switch (name.toLowerCase()) {
+      case 'beginner':
+        return const Color(0xFF2ECC71);
+      case 'intermediate':
+        return const Color(0xFFFF8A00);
+      case 'advanced':
+        return const Color(0xFFEF5350);
+      default:
+        return const Color(0xFF88CEFF);
+    }
+  }
+
+  IconData _getLevelIcon(String name) {
+    switch (name.toLowerCase()) {
+      case 'beginner':
+        return Icons.eco;
+      case 'intermediate':
+        return Icons.trending_up;
+      case 'advanced':
+        return Icons.rocket;
+      default:
+        return Icons.star;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    return Consumer<ChatProvider>(
+      builder: (context, chatProvider, _) {
+        final isSelected = chatProvider.selectedDifficulty == difficulty;
+        final levelColor = _getLevelColor(difficulty.name);
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: GestureDetector(
+            onTap: () => chatProvider.setDifficulty(difficulty),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? themeProvider.primaryColor.withOpacity(0.1)
+                        : Colors.white.withOpacity(0.04),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isSelected
+                          ? themeProvider.primaryColor
+                          : Colors.white.withOpacity(0.1),
+                      width: isSelected ? 1.5 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: levelColor.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(_getLevelIcon(difficulty.name),
+                            color: levelColor, size: 24),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              difficulty.name,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: isSelected
+                                    ? themeProvider.primaryColor
+                                    : Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              difficulty.description,
+                              style: const TextStyle(
+                                  fontSize: 12, color: Color(0xFFDDC1AE)),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (isSelected)
+                        Icon(Icons.check_circle,
+                            color: themeProvider.primaryColor, size: 24),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+
+
+
+
+

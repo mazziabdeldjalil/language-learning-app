@@ -1,0 +1,155 @@
+CONST + AppColors occurrences (unique by file+line)
+
+lib/screens/chat_screen.dart (13)
+- [lib/screens/chat_screen.dart#L70](lib/screens/chat_screen.dart#L70):           iconTheme: const IconThemeData(color: AppColors.neonGreen),
+- [lib/screens/chat_screen.dart#L93](lib/screens/chat_screen.dart#L93):                       : const Text('End Session', style: TextStyle(color: AppColors.neonGreen)),
+- [lib/screens/chat_screen.dart#L122](lib/screens/chat_screen.dart#L122):                           const Icon(
+- [lib/screens/chat_screen.dart#L190](lib/screens/chat_screen.dart#L190):                                   const Padding(
+- [lib/screens/chat_screen.dart#L256](lib/screens/chat_screen.dart#L256):                                           icon: const Icon(Icons.volume_up, size: 20, color: AppColors.neonGreen),
+- [lib/screens/chat_screen.dart#L310](lib/screens/chat_screen.dart#L310):                                     const Row(
+- [lib/screens/chat_screen.dart#L359](lib/screens/chat_screen.dart#L359):                         const Icon(
+- [lib/screens/chat_screen.dart#L395](lib/screens/chat_screen.dart#L395):                       style: const TextStyle(color: AppColors.textPrimary),
+- [lib/screens/chat_screen.dart#L398](lib/screens/chat_screen.dart#L398):                         hintStyle: const TextStyle(color: AppColors.textMuted),
+- [lib/screens/chat_screen.dart#L403](lib/screens/chat_screen.dart#L403):                           borderSide: const BorderSide(color: AppColors.cardBorder),
+- [lib/screens/chat_screen.dart#L407](lib/screens/chat_screen.dart#L407):                           borderSide: const BorderSide(color: AppColors.cardBorder),
+- [lib/screens/chat_screen.dart#L411](lib/screens/chat_screen.dart#L411):                           borderSide: const BorderSide(color: AppColors.neonGreen, width: 1.5),
+- [lib/screens/chat_screen.dart#L551](lib/screens/chat_screen.dart#L551):                 const Icon(
+
+lib/screens/exercises_screen.dart (4)
+- [lib/screens/exercises_screen.dart#L126](lib/screens/exercises_screen.dart#L126):         iconTheme: const IconThemeData(color: AppColors.neonGreen),
+- [lib/screens/exercises_screen.dart#L163](lib/screens/exercises_screen.dart#L163):                       iconTheme: const IconThemeData(color: AppColors.neonGreen),
+- [lib/screens/exercises_screen.dart#L173](lib/screens/exercises_screen.dart#L173):                               const Text(
+- [lib/screens/exercises_screen.dart#L182](lib/screens/exercises_screen.dart#L182):                               const Text(
+
+lib/screens/home_screen.dart (23)
+- [lib/screens/home_screen.dart#L75](lib/screens/home_screen.dart#L75):               const Text(
+- [lib/screens/home_screen.dart#L100](lib/screens/home_screen.dart#L100):         style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+- [lib/screens/home_screen.dart#L127](lib/screens/home_screen.dart#L127):               child: const Icon(Icons.auto_awesome, color: AppColors.neonGreen, size: 16),
+- [lib/screens/home_screen.dart#L130](lib/screens/home_screen.dart#L130):             const Text(
+- [lib/screens/home_screen.dart#L165](lib/screens/home_screen.dart#L165):             icon: const Icon(Icons.palette_outlined, color: AppColors.neonGreen),
+- [lib/screens/home_screen.dart#L169](lib/screens/home_screen.dart#L169):             icon: const Icon(Icons.logout, color: AppColors.neonGreen),
+- [lib/screens/home_screen.dart#L246](lib/screens/home_screen.dart#L246):                                 const Text(
+- [lib/screens/home_screen.dart#L257](lib/screens/home_screen.dart#L257):                                     style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+- [lib/screens/home_screen.dart#L319](lib/screens/home_screen.dart#L319):                                 const Text(
+- [lib/screens/home_screen.dart#L330](lib/screens/home_screen.dart#L330):                                     style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+- [lib/screens/home_screen.dart#L398](lib/screens/home_screen.dart#L398):                   leading: const Icon(Icons.bar_chart, color: AppColors.neonGreen),
+- [lib/screens/home_screen.dart#L407](lib/screens/home_screen.dart#L407):                   trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),
+- [lib/screens/home_screen.dart#L420](lib/screens/home_screen.dart#L420):                   leading: const Icon(Icons.school_outlined, color: AppColors.neonGreen),
+- [lib/screens/home_screen.dart#L429](lib/screens/home_screen.dart#L429):                   trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),
+- [lib/screens/home_screen.dart#L444](lib/screens/home_screen.dart#L444):                   leading: const Icon(Icons.record_voice_over, color: AppColors.neonGreen),
+- [lib/screens/home_screen.dart#L453](lib/screens/home_screen.dart#L453):                   trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),
+- [lib/screens/home_screen.dart#L464](lib/screens/home_screen.dart#L464):                   leading: const Icon(Icons.school_rounded, color: AppColors.xpBlue),
+- [lib/screens/home_screen.dart#L473](lib/screens/home_screen.dart#L473):                   trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),
+- [lib/screens/home_screen.dart#L484](lib/screens/home_screen.dart#L484):                   leading: const Icon(Icons.people, color: AppColors.neonGreen),
+- [lib/screens/home_screen.dart#L493](lib/screens/home_screen.dart#L493):                   trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),
+- [lib/screens/home_screen.dart#L505](lib/screens/home_screen.dart#L505):                     leading: const Icon(Icons.admin_panel_settings, color: AppColors.neonGreen),
+- [lib/screens/home_screen.dart#L514](lib/screens/home_screen.dart#L514):                     trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),
+- [lib/screens/home_screen.dart#L534](lib/screens/home_screen.dart#L534):                     const Icon(Icons.settings, color: AppColors.neonGreen),
+
+lib/screens/login_screen.dart (13)
+- [lib/screens/login_screen.dart#L82](lib/screens/login_screen.dart#L82):                 child: const Icon(Icons.auto_awesome, color: AppColors.neonGreen, size: 32),
+- [lib/screens/login_screen.dart#L85](lib/screens/login_screen.dart#L85):               const Text(
+- [lib/screens/login_screen.dart#L94](lib/screens/login_screen.dart#L94):               const Text(
+- [lib/screens/login_screen.dart#L104](lib/screens/login_screen.dart#L104):               const Text(
+- [lib/screens/login_screen.dart#L114](lib/screens/login_screen.dart#L114):               const Align(
+- [lib/screens/login_screen.dart#L130](lib/screens/login_screen.dart#L130):                 style: const TextStyle(color: AppColors.textPrimary),
+- [lib/screens/login_screen.dart#L133](lib/screens/login_screen.dart#L133):                   prefix: const Icon(Icons.mail_outline, color: AppColors.textMuted, size: 20),
+- [lib/screens/login_screen.dart#L137](lib/screens/login_screen.dart#L137):               const Row(
+- [lib/screens/login_screen.dart#L155](lib/screens/login_screen.dart#L155):                 style: const TextStyle(color: AppColors.textPrimary),
+- [lib/screens/login_screen.dart#L158](lib/screens/login_screen.dart#L158):                   prefix: const Icon(Icons.lock_outline, color: AppColors.textMuted, size: 20),
+- [lib/screens/login_screen.dart#L173](lib/screens/login_screen.dart#L173):                     style: const TextStyle(color: AppColors.errorRed),
+- [lib/screens/login_screen.dart#L193](lib/screens/login_screen.dart#L193):               const Row(
+- [lib/screens/login_screen.dart#L214](lib/screens/login_screen.dart#L214):                   const Text(
+
+lib/screens/progress_screen.dart (21)
+- [lib/screens/progress_screen.dart#L66](lib/screens/progress_screen.dart#L66):         iconTheme: const IconThemeData(color: AppColors.neonGreen),
+- [lib/screens/progress_screen.dart#L67](lib/screens/progress_screen.dart#L67):         title: const Text('My Progress', style: TextStyle(color: AppColors.textPrimary)),
+- [lib/screens/progress_screen.dart#L116](lib/screens/progress_screen.dart#L116):                 const Text(
+- [lib/screens/progress_screen.dart#L129](lib/screens/progress_screen.dart#L129):                 const Row(
+- [lib/screens/progress_screen.dart#L142](lib/screens/progress_screen.dart#L142):                 const Text(
+- [lib/screens/progress_screen.dart#L157](lib/screens/progress_screen.dart#L157):                 const Text(
+- [lib/screens/progress_screen.dart#L247](lib/screens/progress_screen.dart#L247):         const Padding(
+- [lib/screens/progress_screen.dart#L264](lib/screens/progress_screen.dart#L264):           const Text(
+- [lib/screens/progress_screen.dart#L298](lib/screens/progress_screen.dart#L298):                   leading: const Icon(Icons.calendar_today, color: AppColors.neonGreen),
+- [lib/screens/progress_screen.dart#L301](lib/screens/progress_screen.dart#L301):                     style: const TextStyle(color: AppColors.textPrimary),
+- [lib/screens/progress_screen.dart#L305](lib/screens/progress_screen.dart#L305):                     style: const TextStyle(color: AppColors.textSecondary),
+- [lib/screens/progress_screen.dart#L332](lib/screens/progress_screen.dart#L332):         const Padding(
+- [lib/screens/progress_screen.dart#L349](lib/screens/progress_screen.dart#L349):           const Text(
+- [lib/screens/progress_screen.dart#L418](lib/screens/progress_screen.dart#L418):                               style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+- [lib/screens/progress_screen.dart#L457](lib/screens/progress_screen.dart#L457):                         style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+- [lib/screens/progress_screen.dart#L552](lib/screens/progress_screen.dart#L552):             style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+- [lib/screens/progress_screen.dart#L615](lib/screens/progress_screen.dart#L615):                   style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+- [lib/screens/progress_screen.dart#L630](lib/screens/progress_screen.dart#L630):                       style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
+- [lib/screens/progress_screen.dart#L689](lib/screens/progress_screen.dart#L689):         Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+- [lib/screens/progress_screen.dart#L766](lib/screens/progress_screen.dart#L766):                 style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+- [lib/screens/progress_screen.dart#L786](lib/screens/progress_screen.dart#L786):                     style: const TextStyle(fontSize: 11, color: AppColors.errorRed),
+
+lib/screens/pronunciation_screen.dart (4)
+- [lib/screens/pronunciation_screen.dart#L349](lib/screens/pronunciation_screen.dart#L349):                 icon: const Icon(Icons.volume_up, color: AppColors.neonGreen),
+- [lib/screens/pronunciation_screen.dart#L365](lib/screens/pronunciation_screen.dart#L365):         iconTheme: const IconThemeData(color: AppColors.neonGreen),
+- [lib/screens/pronunciation_screen.dart#L377](lib/screens/pronunciation_screen.dart#L377):               style: const TextStyle(color: AppColors.textPrimary),
+- [lib/screens/pronunciation_screen.dart#L385](lib/screens/pronunciation_screen.dart#L385):                 prefix: const Icon(Icons.search, color: AppColors.textMuted),
+
+lib/screens/register_screen.dart (12)
+- [lib/screens/register_screen.dart#L95](lib/screens/register_screen.dart#L95):         title: const Text('Create Account', style: TextStyle(color: AppColors.textPrimary)),
+- [lib/screens/register_screen.dart#L96](lib/screens/register_screen.dart#L96):         iconTheme: const IconThemeData(color: AppColors.neonGreen),
+- [lib/screens/register_screen.dart#L105](lib/screens/register_screen.dart#L105):               const Text(
+- [lib/screens/register_screen.dart#L118](lib/screens/register_screen.dart#L118):                 style: const TextStyle(color: AppColors.textPrimary),
+- [lib/screens/register_screen.dart#L121](lib/screens/register_screen.dart#L121):                   prefix: const Icon(Icons.mail_outline, color: AppColors.textMuted, size: 20),
+- [lib/screens/register_screen.dart#L125](lib/screens/register_screen.dart#L125):               const Text(
+- [lib/screens/register_screen.dart#L138](lib/screens/register_screen.dart#L138):                 style: const TextStyle(color: AppColors.textPrimary),
+- [lib/screens/register_screen.dart#L141](lib/screens/register_screen.dart#L141):                   prefix: const Icon(Icons.lock_outline, color: AppColors.textMuted, size: 20),
+- [lib/screens/register_screen.dart#L145](lib/screens/register_screen.dart#L145):               const Text(
+- [lib/screens/register_screen.dart#L158](lib/screens/register_screen.dart#L158):                 style: const TextStyle(color: AppColors.textPrimary),
+- [lib/screens/register_screen.dart#L161](lib/screens/register_screen.dart#L161):                   prefix: const Icon(Icons.lock_reset_outlined, color: AppColors.textMuted, size: 20),
+- [lib/screens/register_screen.dart#L176](lib/screens/register_screen.dart#L176):                     style: const TextStyle(color: AppColors.errorRed),
+
+lib/screens/summary_screen.dart (13)
+- [lib/screens/summary_screen.dart#L21](lib/screens/summary_screen.dart#L21):         iconTheme: const IconThemeData(color: AppColors.neonGreen),
+- [lib/screens/summary_screen.dart#L44](lib/screens/summary_screen.dart#L44):             const Text(
+- [lib/screens/summary_screen.dart#L55](lib/screens/summary_screen.dart#L55):               style: const TextStyle(fontSize: 16, color: AppColors.textSecondary),
+- [lib/screens/summary_screen.dart#L60](lib/screens/summary_screen.dart#L60):             const Text(
+- [lib/screens/summary_screen.dart#L91](lib/screens/summary_screen.dart#L91):               const Text(
+- [lib/screens/summary_screen.dart#L104](lib/screens/summary_screen.dart#L104):                     const Icon(Icons.circle, size: 8, color: AppColors.neonGreen),
+- [lib/screens/summary_screen.dart#L108](lib/screens/summary_screen.dart#L108):                       style: const TextStyle(fontSize: 15, color: AppColors.textSecondary),
+- [lib/screens/summary_screen.dart#L118](lib/screens/summary_screen.dart#L118):               const Text(
+- [lib/screens/summary_screen.dart#L131](lib/screens/summary_screen.dart#L131):                     const Icon(Icons.arrow_forward, size: 16, color: AppColors.neonGreen),
+- [lib/screens/summary_screen.dart#L136](lib/screens/summary_screen.dart#L136):                         style: const TextStyle(fontSize: 15, color: AppColors.textSecondary),
+- [lib/screens/summary_screen.dart#L151](lib/screens/summary_screen.dart#L151):                   const Icon(Icons.lightbulb_outline, color: AppColors.xpBlue, size: 22),
+- [lib/screens/summary_screen.dart#L157](lib/screens/summary_screen.dart#L157):                         const Text(
+- [lib/screens/summary_screen.dart#L188](lib/screens/summary_screen.dart#L188):                   const Text(
+
+lib/theme/app_theme.dart (5)
+- [lib/theme/app_theme.dart#L182](lib/theme/app_theme.dart#L182):       side: const BorderSide(color: AppColors.cardBorder, width: 1.5),
+- [lib/theme/app_theme.dart#L193](lib/theme/app_theme.dart#L193):       hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 15),
+- [lib/theme/app_theme.dart#L202](lib/theme/app_theme.dart#L202):         borderSide: const BorderSide(color: AppColors.cardBorder),
+- [lib/theme/app_theme.dart#L206](lib/theme/app_theme.dart#L206):         borderSide: const BorderSide(color: AppColors.cardBorder),
+- [lib/theme/app_theme.dart#L211](lib/theme/app_theme.dart#L211):             const BorderSide(color: AppColors.neonGreen, width: 1.5),
+
+TOTAL const+AppColors occurrences: 108
+
+AppColors reference counts across lib
+- [lib/core/backend.dart](lib/core/backend.dart): 0
+- [lib/core/supabase_config.dart](lib/core/supabase_config.dart): 0
+- [lib/core/supabase_service.dart](lib/core/supabase_service.dart): 0
+- [lib/data/learn_content.dart](lib/data/learn_content.dart): 0
+- [lib/main.dart](lib/main.dart): 0
+- [lib/screens/admin_screen.dart](lib/screens/admin_screen.dart): 0
+- [lib/screens/chat_screen.dart](lib/screens/chat_screen.dart): 43
+- [lib/screens/community_screen.dart](lib/screens/community_screen.dart): 0
+- [lib/screens/difficulty_selection_screen.dart](lib/screens/difficulty_selection_screen.dart): 0
+- [lib/screens/exercises_screen.dart](lib/screens/exercises_screen.dart): 103
+- [lib/screens/home_screen.dart](lib/screens/home_screen.dart): 53
+- [lib/screens/index.dart](lib/screens/index.dart): 0
+- [lib/screens/learn_screen.dart](lib/screens/learn_screen.dart): 60
+- [lib/screens/login_screen.dart](lib/screens/login_screen.dart): 20
+- [lib/screens/progress_screen.dart](lib/screens/progress_screen.dart): 65
+- [lib/screens/pronunciation_screen.dart](lib/screens/pronunciation_screen.dart): 13
+- [lib/screens/register_screen.dart](lib/screens/register_screen.dart): 17
+- [lib/screens/scenario_selection_screen.dart](lib/screens/scenario_selection_screen.dart): 0
+- [lib/screens/summary_screen.dart](lib/screens/summary_screen.dart): 26
+- [lib/screens/username_screen.dart](lib/screens/username_screen.dart): 0
+- [lib/services/gcp_tts_service.dart](lib/services/gcp_tts_service.dart): 0
+- [lib/services/stt_service.dart](lib/services/stt_service.dart): 0
+- [lib/theme/app_theme.dart](lib/theme/app_theme.dart): 21
+TOTAL AppColors references: 421

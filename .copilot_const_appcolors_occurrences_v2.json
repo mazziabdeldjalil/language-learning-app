@@ -1,0 +1,680 @@
+﻿[
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\chat_screen.dart",
+        "Line":  70,
+        "LineText":  "          iconTheme: const IconThemeData(color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\chat_screen.dart",
+        "Line":  93,
+        "LineText":  "                      : const Text(\u0027End Session\u0027, style: TextStyle(color: AppColors.neonGreen)),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\chat_screen.dart",
+        "Line":  122,
+        "LineText":  "                          const Icon(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\chat_screen.dart",
+        "Line":  190,
+        "LineText":  "                                  const Padding(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\chat_screen.dart",
+        "Line":  256,
+        "LineText":  "                                          icon: const Icon(Icons.volume_up, size: 20, color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\chat_screen.dart",
+        "Line":  310,
+        "LineText":  "                                    const Row(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\chat_screen.dart",
+        "Line":  359,
+        "LineText":  "                        const Icon(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\chat_screen.dart",
+        "Line":  395,
+        "LineText":  "                      style: const TextStyle(color: AppColors.textPrimary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\chat_screen.dart",
+        "Line":  398,
+        "LineText":  "                        hintStyle: const TextStyle(color: AppColors.textMuted),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\chat_screen.dart",
+        "Line":  403,
+        "LineText":  "                          borderSide: const BorderSide(color: AppColors.cardBorder),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\chat_screen.dart",
+        "Line":  407,
+        "LineText":  "                          borderSide: const BorderSide(color: AppColors.cardBorder),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\chat_screen.dart",
+        "Line":  411,
+        "LineText":  "                          borderSide: const BorderSide(color: AppColors.neonGreen, width: 1.5),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\chat_screen.dart",
+        "Line":  551,
+        "LineText":  "                const Icon(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\exercises_screen.dart",
+        "Line":  126,
+        "LineText":  "        iconTheme: const IconThemeData(color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\exercises_screen.dart",
+        "Line":  163,
+        "LineText":  "                      iconTheme: const IconThemeData(color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\exercises_screen.dart",
+        "Line":  173,
+        "LineText":  "                              const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\exercises_screen.dart",
+        "Line":  182,
+        "LineText":  "                              const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  75,
+        "LineText":  "              const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  100,
+        "LineText":  "        style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  127,
+        "LineText":  "              child: const Icon(Icons.auto_awesome, color: AppColors.neonGreen, size: 16),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  130,
+        "LineText":  "            const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  165,
+        "LineText":  "            icon: const Icon(Icons.palette_outlined, color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  169,
+        "LineText":  "            icon: const Icon(Icons.logout, color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  246,
+        "LineText":  "                                const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  257,
+        "LineText":  "                                    style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  319,
+        "LineText":  "                                const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  330,
+        "LineText":  "                                    style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  398,
+        "LineText":  "                  leading: const Icon(Icons.bar_chart, color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  407,
+        "LineText":  "                  trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  420,
+        "LineText":  "                  leading: const Icon(Icons.school_outlined, color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  429,
+        "LineText":  "                  trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  444,
+        "LineText":  "                  leading: const Icon(Icons.record_voice_over, color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  453,
+        "LineText":  "                  trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  464,
+        "LineText":  "                  leading: const Icon(Icons.school_rounded, color: AppColors.xpBlue),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  473,
+        "LineText":  "                  trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  484,
+        "LineText":  "                  leading: const Icon(Icons.people, color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  493,
+        "LineText":  "                  trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  505,
+        "LineText":  "                    leading: const Icon(Icons.admin_panel_settings, color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  514,
+        "LineText":  "                    trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  534,
+        "LineText":  "                    const Icon(Icons.settings, color: AppColors.neonGreen),",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\home_screen.dart",
+        "Line":  534,
+        "LineText":  "                    const Icon(Icons.settings, color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\login_screen.dart",
+        "Line":  82,
+        "LineText":  "                child: const Icon(Icons.auto_awesome, color: AppColors.neonGreen, size: 32),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\login_screen.dart",
+        "Line":  85,
+        "LineText":  "              const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\login_screen.dart",
+        "Line":  94,
+        "LineText":  "              const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\login_screen.dart",
+        "Line":  104,
+        "LineText":  "              const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\login_screen.dart",
+        "Line":  114,
+        "LineText":  "              const Align(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\login_screen.dart",
+        "Line":  130,
+        "LineText":  "                style: const TextStyle(color: AppColors.textPrimary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\login_screen.dart",
+        "Line":  133,
+        "LineText":  "                  prefix: const Icon(Icons.mail_outline, color: AppColors.textMuted, size: 20),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\login_screen.dart",
+        "Line":  137,
+        "LineText":  "              const Row(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\login_screen.dart",
+        "Line":  155,
+        "LineText":  "                style: const TextStyle(color: AppColors.textPrimary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\login_screen.dart",
+        "Line":  158,
+        "LineText":  "                  prefix: const Icon(Icons.lock_outline, color: AppColors.textMuted, size: 20),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\login_screen.dart",
+        "Line":  173,
+        "LineText":  "                    style: const TextStyle(color: AppColors.errorRed),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\login_screen.dart",
+        "Line":  193,
+        "LineText":  "              const Row(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\login_screen.dart",
+        "Line":  214,
+        "LineText":  "                  const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  66,
+        "LineText":  "        iconTheme: const IconThemeData(color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  67,
+        "LineText":  "        title: const Text(\u0027My Progress\u0027, style: TextStyle(color: AppColors.textPrimary)),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  116,
+        "LineText":  "                const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  129,
+        "LineText":  "                const Row(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  142,
+        "LineText":  "                const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  157,
+        "LineText":  "                const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  247,
+        "LineText":  "        const Padding(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  264,
+        "LineText":  "          const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  298,
+        "LineText":  "                  leading: const Icon(Icons.calendar_today, color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  301,
+        "LineText":  "                    style: const TextStyle(color: AppColors.textPrimary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  305,
+        "LineText":  "                    style: const TextStyle(color: AppColors.textSecondary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  332,
+        "LineText":  "        const Padding(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  349,
+        "LineText":  "          const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  418,
+        "LineText":  "                              style: const TextStyle(fontSize: 12, color: AppColors.textMuted),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  457,
+        "LineText":  "                        style: const TextStyle(fontSize: 11, color: AppColors.textMuted),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  552,
+        "LineText":  "            style: const TextStyle(fontSize: 11, color: AppColors.textMuted),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  615,
+        "LineText":  "                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  630,
+        "LineText":  "                      style: const TextStyle(fontSize: 10, color: AppColors.textMuted),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  689,
+        "LineText":  "        Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  766,
+        "LineText":  "                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\progress_screen.dart",
+        "Line":  786,
+        "LineText":  "                    style: const TextStyle(fontSize: 11, color: AppColors.errorRed),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\pronunciation_screen.dart",
+        "Line":  349,
+        "LineText":  "                icon: const Icon(Icons.volume_up, color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\pronunciation_screen.dart",
+        "Line":  365,
+        "LineText":  "        iconTheme: const IconThemeData(color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\pronunciation_screen.dart",
+        "Line":  377,
+        "LineText":  "              style: const TextStyle(color: AppColors.textPrimary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\pronunciation_screen.dart",
+        "Line":  385,
+        "LineText":  "                prefix: const Icon(Icons.search, color: AppColors.textMuted),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\register_screen.dart",
+        "Line":  95,
+        "LineText":  "        title: const Text(\u0027Create Account\u0027, style: TextStyle(color: AppColors.textPrimary)),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\register_screen.dart",
+        "Line":  96,
+        "LineText":  "        iconTheme: const IconThemeData(color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\register_screen.dart",
+        "Line":  105,
+        "LineText":  "              const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\register_screen.dart",
+        "Line":  118,
+        "LineText":  "                style: const TextStyle(color: AppColors.textPrimary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\register_screen.dart",
+        "Line":  121,
+        "LineText":  "                  prefix: const Icon(Icons.mail_outline, color: AppColors.textMuted, size: 20),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\register_screen.dart",
+        "Line":  125,
+        "LineText":  "              const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\register_screen.dart",
+        "Line":  138,
+        "LineText":  "                style: const TextStyle(color: AppColors.textPrimary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\register_screen.dart",
+        "Line":  141,
+        "LineText":  "                  prefix: const Icon(Icons.lock_outline, color: AppColors.textMuted, size: 20),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\register_screen.dart",
+        "Line":  145,
+        "LineText":  "              const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\register_screen.dart",
+        "Line":  158,
+        "LineText":  "                style: const TextStyle(color: AppColors.textPrimary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\register_screen.dart",
+        "Line":  161,
+        "LineText":  "                  prefix: const Icon(Icons.lock_reset_outlined, color: AppColors.textMuted, size: 20),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\register_screen.dart",
+        "Line":  176,
+        "LineText":  "                    style: const TextStyle(color: AppColors.errorRed),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Line":  21,
+        "LineText":  "        iconTheme: const IconThemeData(color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Line":  44,
+        "LineText":  "            const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Line":  55,
+        "LineText":  "              style: const TextStyle(fontSize: 16, color: AppColors.textSecondary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Line":  60,
+        "LineText":  "            const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Line":  91,
+        "LineText":  "              const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Line":  104,
+        "LineText":  "                    const Icon(Icons.circle, size: 8, color: AppColors.neonGreen),",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Line":  104,
+        "LineText":  "                    const Icon(Icons.circle, size: 8, color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Line":  108,
+        "LineText":  "                      style: const TextStyle(fontSize: 15, color: AppColors.textSecondary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Line":  118,
+        "LineText":  "              const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Line":  131,
+        "LineText":  "                    const Icon(Icons.arrow_forward, size: 16, color: AppColors.neonGreen),",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Line":  131,
+        "LineText":  "                    const Icon(Icons.arrow_forward, size: 16, color: AppColors.neonGreen),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Line":  136,
+        "LineText":  "                        style: const TextStyle(fontSize: 15, color: AppColors.textSecondary),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Line":  151,
+        "LineText":  "                  const Icon(Icons.lightbulb_outline, color: AppColors.xpBlue, size: 22),",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Line":  151,
+        "LineText":  "                  const Icon(Icons.lightbulb_outline, color: AppColors.xpBlue, size: 22),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Line":  157,
+        "LineText":  "                        const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\screens\\summary_screen.dart",
+        "Line":  188,
+        "LineText":  "                  const Text(",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\theme\\app_theme.dart",
+        "Line":  182,
+        "LineText":  "      side: const BorderSide(color: AppColors.cardBorder, width: 1.5),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\theme\\app_theme.dart",
+        "Line":  193,
+        "LineText":  "      hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 15),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\theme\\app_theme.dart",
+        "Line":  202,
+        "LineText":  "        borderSide: const BorderSide(color: AppColors.cardBorder),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\theme\\app_theme.dart",
+        "Line":  206,
+        "LineText":  "        borderSide: const BorderSide(color: AppColors.cardBorder),",
+        "Kind":  "same-line"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\theme\\app_theme.dart",
+        "Line":  211,
+        "LineText":  "            const BorderSide(color: AppColors.neonGreen, width: 1.5),",
+        "Kind":  "constructor"
+    },
+    {
+        "File":  "C:\\Users\\Ztr\\Desktop\\M2B\\THESIS\\Prototype Test\\language_learning_app\\lib\\theme\\app_theme.dart",
+        "Line":  211,
+        "LineText":  "            const BorderSide(color: AppColors.neonGreen, width: 1.5),",
+        "Kind":  "same-line"
+    }
+]

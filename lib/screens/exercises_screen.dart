@@ -1,0 +1,1672 @@
+import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../core/backend.dart';
+import '../core/supabase_service.dart';
+import '../providers/theme_provider.dart';
+import '../widgets/help_dialog.dart';
+
+class ExercisesScreen extends StatefulWidget {
+  const ExercisesScreen({super.key});
+
+  @override
+  State<ExercisesScreen> createState() => _ExercisesScreenState();
+}
+
+class _ExercisesScreenState extends State<ExercisesScreen> {
+  bool _sessionStarted = false;
+  final Set<String> _selectedTypes = {'grammar', 'vocabulary', 'fill_blank', 'word_order'};
+  int _questionCount = 5;
+  String _selectedDifficulty = 'beginner';
+  int _currentIndex = 0;
+  int _correctCount = 0;
+  bool _sessionDone = false;
+  bool _exercisesReadyToStart = false;
+  String _selectedMiniGame = '';
+  final Map<String, List<int>> _categoryResults = {};
+
+  final Map<String, String> _typeLabels = {
+    'grammar': '📝 Grammar',
+    'vocabulary': '📚 Vocabulary',
+    'fill_blank': '✏️ Fill in Blank',
+    'word_order': '🔀 Word Order',
+  };
+
+  void _startSession() {
+    _exercisesReadyToStart = false;
+    _selectedMiniGame = '';
+    if (_selectedTypes.isEmpty) return;
+    final maxAllowed = _selectedTypes.length * 5;
+    final effectiveCount = _questionCount.clamp(1, maxAllowed);
+    setState(() {
+      _sessionStarted = true;
+      _currentIndex = 0;
+      _correctCount = 0;
+      _sessionDone = false;
+      _categoryResults.clear();
+    });
+    final provider = Provider.of<ChatProvider>(context, listen: false);
+    provider.setExerciseDifficulty(_selectedDifficulty);
+    provider.loadExercises(types: _selectedTypes.toList(), count: effectiveCount);
+  }
+
+  void _onExerciseComplete(bool wasCorrect, String exerciseType) {
+    if (wasCorrect) _correctCount++;
+    _categoryResults[exerciseType] ??= [0, 0];
+    _categoryResults[exerciseType]![1]++;
+    if (wasCorrect) _categoryResults[exerciseType]![0]++;
+    final exercises = Provider.of<ChatProvider>(context, listen: false).exercises;
+    if (_currentIndex + 1 >= exercises.length) {
+      _saveResults();
+      setState(() => _sessionDone = true);
+    } else {
+      setState(() => _currentIndex++);
+    }
+  }
+
+  void _saveResults() {
+    final provider = Provider.of<ChatProvider>(context, listen: false);
+    final total = provider.exercises.length;
+    final Map<String, double> categoryScores = {};
+    _categoryResults.forEach((type, counts) {
+      categoryScores[type] = counts[1] > 0 ? (counts[0] / counts[1] * 100).roundToDouble() : 0.0;
+    });
+    provider.saveExerciseResult(
+      total: total, correct: _correctCount,
+      typesSelected: _selectedTypes.toList(), categoryScores: categoryScores,
+    );
+    final supaId = SupabaseService.currentUserId;
+    if (supaId != null) SupabaseService.logActivity(userId: supaId, exercisesDelta: 1);
+  }
+
+  void _restart() {
+    setState(() {
+      _sessionStarted = false;
+      _currentIndex = 0;
+      _correctCount = 0;
+      _sessionDone = false;
+      _categoryResults.clear();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF131313),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF131313),
+        elevation: 0,
+        iconTheme: IconThemeData(color: themeProvider.primaryColor),
+        title: Text('',
+          style: TextStyle(
+            color: themeProvider.primaryColor,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5)),
+        leading: _sessionStarted && !_sessionDone
+            ? IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: _restart,
+                tooltip: 'Back to selection',
+              )
+            : null,
+      ),
+      body: !_sessionStarted
+          ? _SelectionScreen(
+              selectedTypes: _selectedTypes,
+              questionCount: _questionCount,
+              typeLabels: _typeLabels,
+              selectedDifficulty: _selectedDifficulty,
+              onToggleType: (type) {
+                setState(() {
+                  if (_selectedTypes.contains(type)) {
+                    if (_selectedTypes.length > 1) _selectedTypes.remove(type);
+                  } else {
+                    _selectedTypes.add(type);
+                  }
+                });
+              },
+              onCountChanged: (val) => setState(() => _questionCount = val),
+              onDifficultyChanged: (d) => setState(() => _selectedDifficulty = d),
+              onStart: _startSession,
+            )
+          : Consumer<ChatProvider>(
+              builder: (context, provider, _) {
+                if (provider.isLoadingExercises || (!_exercisesReadyToStart && provider.exercises.isNotEmpty)) {
+                  return Scaffold(
+                    backgroundColor: const Color(0xFF131313),
+                    appBar: AppBar(
+                      backgroundColor: const Color(0xFF131313),
+                      elevation: 0,
+                      iconTheme: IconThemeData(color: themeProvider.primaryColor),
+                      title: Text('Loading Exercises...',
+                          style: TextStyle(color: themeProvider.primaryColor)),
+                    ),
+                    body: Center(
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 24),
+                              const Text('Getting your exercises ready!',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                              const SizedBox(height: 8),
+                              const Text('Play while you wait 🎮',
+                                  style: TextStyle(fontSize: 14, color: Color(0xFFDDC1AE))),
+                              const SizedBox(height: 24),
+                              _MiniGameHub(
+                                exercisesReady: !provider.isLoadingExercises && provider.exercises.isNotEmpty,
+                                selectedGame: _selectedMiniGame,
+                                onGameSelected: (game) => setState(() => _selectedMiniGame = game),
+                                onExercisesReady: () => setState(() => _exercisesReadyToStart = true),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                if (provider.exercises.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error_outline, size: 48, color: Colors.white38),
+                        const SizedBox(height: 16),
+                        const Text('Could not load exercises',
+                            style: TextStyle(fontSize: 16, color: Color(0xFFDDC1AE))),
+                        const SizedBox(height: 16),
+                        ElevatedButton(onPressed: _restart, child: const Text('Try Again')),
+                      ],
+                    ),
+                  );
+                }
+
+                if (_sessionDone) {
+                  return _ResultsScreen(
+                    correct: _correctCount,
+                    total: provider.exercises.length,
+                    categoryResults: _categoryResults,
+                    typeLabels: _typeLabels,
+                    onRestart: _restart,
+                    onHome: () => Navigator.pop(context),
+                  );
+                }
+
+                if (provider.exercises.isEmpty || _currentIndex >= provider.exercises.length) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(color: themeProvider.primaryColor),
+                        const SizedBox(height: 16),
+                        const Text('Loading question...', style: TextStyle(color: Color(0xFFDDC1AE))),
+                      ],
+                    ),
+                  );
+                }
+
+                final exercise = provider.exercises[_currentIndex];
+                return Column(
+                  children: [
+                    _ProgressHeader(
+                      current: _currentIndex + 1,
+                      total: provider.exercises.length,
+                      correct: _correctCount,
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(20),
+                        child: exercise.type == 'word_order'
+                            ? _WordOrderExercise(
+                                key: ValueKey('wo_$_currentIndex'),
+                                exercise: exercise,
+                                onComplete: (correct) => _onExerciseComplete(correct, exercise.type),
+                              )
+                            : _MultipleChoiceExercise(
+                                key: ValueKey('mc_$_currentIndex'),
+                                exercise: exercise,
+                                onComplete: (correct) => _onExerciseComplete(correct, exercise.type),
+                              ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+    );
+  }
+}
+
+class _SelectionScreen extends StatelessWidget {
+  final Set<String> selectedTypes;
+  final int questionCount;
+  final Map<String, String> typeLabels;
+  final String selectedDifficulty;
+  final Function(String) onToggleType;
+  final Function(int) onCountChanged;
+  final Function(String) onDifficultyChanged;
+  final VoidCallback onStart;
+
+  const _SelectionScreen({
+    required this.selectedTypes, required this.questionCount,
+    required this.typeLabels, required this.selectedDifficulty,
+    required this.onToggleType, required this.onCountChanged,
+    required this.onDifficultyChanged, required this.onStart,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 18),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'FluentlyDZ',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
+                    color: themeProvider.primaryColor,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => showHelpDialog(context),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.white.withOpacity(0.06),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: const Text(
+                    'HELP',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+
+          ),
+          const SizedBox(height: 18),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: themeProvider.primaryColor.withOpacity(0.24),
+              ),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  themeProvider.primaryColor.withOpacity(0.18),
+                  Colors.white.withOpacity(0.02),
+                ],
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Practice with focus.',
+                  style: TextStyle(
+                    fontSize: 27,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: -0.4,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Select exercise types, difficulty, and question count before starting your session.',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Color(0xFFDDC1AE),
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _practiceChip(themeProvider.primaryColor, 'Grammar'),
+                    _practiceChip(const Color(0xFF88CEFF), 'Vocabulary'),
+                    _practiceChip(const Color(0xFFFF8A00), 'Word Order'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text(
+                'Exercise setup',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  letterSpacing: 0.6,
+                ),
+              ),
+              Text(
+                'Choose what to train',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Color(0xFFDDC1AE),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text('Exercise Types',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+          const SizedBox(height: 12),
+          ...typeLabels.entries.map((entry) {
+            final isSelected = selectedTypes.contains(entry.key);
+            return GestureDetector(
+              onTap: () => onToggleType(entry.key),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? themeProvider.primaryColor.withOpacity(0.1)
+                      : Colors.white.withOpacity(0.04),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected
+                        ? themeProvider.primaryColor
+                        : Colors.white.withOpacity(0.1),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      isSelected ? Icons.check_box : Icons.check_box_outline_blank,
+                      color: themeProvider.primaryColor,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(entry.value,
+                        style: TextStyle(
+                            fontSize: 15,
+                            color: isSelected ? Colors.white : const Color(0xFFDDC1AE))),
+                  ],
+                ),
+              ),
+            );
+          }),
+          const SizedBox(height: 28),
+          const Text('Difficulty Level',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(child: _DifficultyChip(label: 'Beginner', emoji: '🌱', value: 'beginner', selectedValue: selectedDifficulty, onTap: onDifficultyChanged)),
+              const SizedBox(width: 8),
+              Expanded(child: _DifficultyChip(label: 'Intermediate', emoji: '⚡', value: 'intermediate', selectedValue: selectedDifficulty, onTap: onDifficultyChanged)),
+              const SizedBox(width: 8),
+              Expanded(child: _DifficultyChip(label: 'Advanced', emoji: '🔥', value: 'advanced', selectedValue: selectedDifficulty, onTap: onDifficultyChanged)),
+            ],
+          ),
+          const SizedBox(height: 28),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Number of Questions',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+                ),
+                child: Text('$questionCount',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+              ),
+            ],
+          ),
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: themeProvider.primaryColor,
+              inactiveTrackColor: Colors.white.withOpacity(0.1),
+              thumbColor: themeProvider.primaryColor,
+            ),
+            child: Slider(
+              value: questionCount.toDouble(),
+              min: 3, max: 15, divisions: 12,
+              label: '$questionCount questions',
+              onChanged: (val) => onCountChanged(val.round()),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text('3', style: TextStyle(fontSize: 12, color: Color(0xFFDDC1AE))),
+              Text('15', style: TextStyle(fontSize: 12, color: Color(0xFFDDC1AE))),
+            ],
+          ),
+          const SizedBox(height: 36),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: selectedTypes.isEmpty ? null : onStart,
+              icon: const Icon(Icons.play_arrow),
+              label: Text('Start $questionCount Question${questionCount > 1 ? 's' : ''}',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: themeProvider.primaryColor,
+                foregroundColor: const Color(0xFF2F1500),
+                minimumSize: const Size(double.infinity, 54),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+Widget _practiceChip(Color color, String label) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+    decoration: BoxDecoration(
+      color: color.withOpacity(0.12),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: color.withOpacity(0.25)),
+    ),
+    child: Text(
+      label,
+      style: TextStyle(
+        color: color,
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+      ),
+    ),
+  );
+}
+
+class _DifficultyChip extends StatelessWidget {
+  final String label, emoji, value, selectedValue;
+  final Function(String) onTap;
+
+  const _DifficultyChip({
+    required this.label, required this.emoji, required this.value,
+    required this.selectedValue, required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isSelected = value == selectedValue;
+    return GestureDetector(
+      onTap: () => onTap(value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? themeProvider.primaryColor.withOpacity(0.15)
+              : Colors.white.withOpacity(0.04),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? themeProvider.primaryColor : Colors.white.withOpacity(0.1),
+          ),
+        ),
+        child: Column(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 20)),
+            const SizedBox(height: 4),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    color: isSelected ? themeProvider.primaryColor : const Color(0xFFDDC1AE))),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProgressHeader extends StatelessWidget {
+  final int current, total, correct;
+
+  const _ProgressHeader({required this.current, required this.total, required this.correct});
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Question $current of $total',
+                  style: const TextStyle(fontSize: 14, color: Color(0xFFDDC1AE))),
+              Row(
+                children: [
+                  Icon(Icons.check_circle, color: themeProvider.primaryColor, size: 16),
+                  const SizedBox(width: 4),
+                  Text('$correct correct',
+                      style: TextStyle(fontSize: 14, color: themeProvider.primaryColor)),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Container(
+            height: 6,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(3),
+            ),
+            child: FractionallySizedBox(
+              widthFactor: current / total,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF88CEFF),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MultipleChoiceExercise extends StatefulWidget {
+  final Exercise exercise;
+  final Function(bool) onComplete;
+
+  const _MultipleChoiceExercise({super.key, required this.exercise, required this.onComplete});
+
+  @override
+  State<_MultipleChoiceExercise> createState() => _MultipleChoiceExerciseState();
+}
+
+class _MultipleChoiceExerciseState extends State<_MultipleChoiceExercise> {
+  int? _selectedIndex;
+  bool _answered = false;
+
+  void _select(int index) {
+    if (_answered) return;
+    setState(() { _selectedIndex = index; _answered = true; });
+  }
+
+  Color _bubbleColor(int index) {
+    if (!_answered) return Colors.white.withOpacity(0.04);
+    if (widget.exercise.correct != null && index == widget.exercise.correct) {
+      return const Color(0xFF2ECC71).withOpacity(0.12);
+    }
+    if (index == _selectedIndex) return const Color(0xFFEF5350).withOpacity(0.12);
+    return Colors.white.withOpacity(0.04);
+  }
+
+  Color _borderColor(int index) {
+    if (!_answered) return Colors.white.withOpacity(0.1);
+    if (widget.exercise.correct != null && index == widget.exercise.correct) return const Color(0xFF2ECC71);
+    if (index == _selectedIndex) return const Color(0xFFEF5350);
+    return Colors.white.withOpacity(0.1);
+  }
+
+  String get _typeLabel {
+    switch (widget.exercise.type) {
+      case 'grammar': return '📝 Grammar';
+      case 'vocabulary': return '📚 Vocabulary';
+      case 'fill_blank': return '✏️ Fill in the Blank';
+      default: return '📝 Exercise';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final options = widget.exercise.options ?? [];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: const Color(0xFF88CEFF).withOpacity(0.12),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(_typeLabel,
+              style: const TextStyle(fontSize: 13, color: Color(0xFF88CEFF), fontWeight: FontWeight.w500)),
+        ),
+        const SizedBox(height: 16),
+        Text(widget.exercise.question,
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white)),
+        const SizedBox(height: 12),
+        if (widget.exercise.sentence != null)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
+            ),
+            child: Text(widget.exercise.sentence!,
+                style: const TextStyle(fontSize: 18, height: 1.5, color: Colors.white),
+                textAlign: TextAlign.center),
+          ),
+        const SizedBox(height: 24),
+        ...options.asMap().entries.map((entry) {
+          final index = entry.key;
+          final option = entry.value;
+          return GestureDetector(
+            onTap: () => _select(index),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: _bubbleColor(index),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: _borderColor(index),
+                  width: _answered && ((widget.exercise.correct != null && index == widget.exercise.correct) || index == _selectedIndex) ? 2 : 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 28, height: 28,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.08),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(String.fromCharCode(65 + index),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13,
+                              color: _answered ? _borderColor(index) : const Color(0xFFDDC1AE))),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(option,
+                      style: const TextStyle(fontSize: 15, color: Colors.white))),
+                  if (_answered && widget.exercise.correct != null && index == widget.exercise.correct)
+                    const Icon(Icons.check_circle, color: Color(0xFF2ECC71), size: 20),
+                  if (_answered && index == _selectedIndex &&
+                      (widget.exercise.correct == null || index != widget.exercise.correct))
+                    const Icon(Icons.cancel, color: Color(0xFFEF5350), size: 20),
+                ],
+              ),
+            ),
+          );
+        }),
+        if (_answered) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: (widget.exercise.correct != null && _selectedIndex == widget.exercise.correct)
+                  ? const Color(0xFF2ECC71).withOpacity(0.12)
+                  : const Color(0xFFFF8A00).withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.lightbulb,
+                    color: (widget.exercise.correct != null && _selectedIndex == widget.exercise.correct)
+                        ? const Color(0xFF2ECC71) : const Color(0xFFFF8A00),
+                    size: 20),
+                const SizedBox(width: 8),
+                Expanded(child: Text(widget.exercise.explanation,
+                    style: const TextStyle(fontSize: 14, color: Color(0xFFDDC1AE)))),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => widget.onComplete(_selectedIndex == widget.exercise.correct),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: themeProvider.primaryColor,
+                foregroundColor: const Color(0xFF2F1500),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text('Next →', style: TextStyle(fontSize: 16)),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _WordOrderExercise extends StatefulWidget {
+  final Exercise exercise;
+  final Function(bool) onComplete;
+
+  const _WordOrderExercise({super.key, required this.exercise, required this.onComplete});
+
+  @override
+  State<_WordOrderExercise> createState() => _WordOrderExerciseState();
+}
+
+class _WordOrderExerciseState extends State<_WordOrderExercise> {
+  late List<String> _availableWords;
+  final List<String> _selectedWords = [];
+  bool _answered = false;
+  bool _isCorrect = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _availableWords = List<String>.from(widget.exercise.words ?? []);
+    _availableWords.shuffle();
+  }
+
+  void _tapAvailable(int index) {
+    if (_answered) return;
+    setState(() {
+      _selectedWords.add(_availableWords[index]);
+      _availableWords.removeAt(index);
+    });
+  }
+
+  void _tapSelected(int index) {
+    if (_answered) return;
+    setState(() {
+      _availableWords.add(_selectedWords[index]);
+      _selectedWords.removeAt(index);
+    });
+  }
+
+  void _checkAnswer() {
+    String normalize(String s) {
+      return s.trim().toLowerCase()
+          .replaceAll('.', '').replaceAll(',', '').replaceAll('!', '')
+          .replaceAll('?', '').replaceAll(';', '').replaceAll(':', '')
+          .replaceAll("'", '').replaceAll('"', '')
+          .replaceAll(RegExp(r'\s+'), ' ').trim();
+    }
+    final userSentence = normalize(_selectedWords.join(' '));
+    final correct = normalize(widget.exercise.correctSentence ?? '');
+    final userNoArticles = userSentence.replaceAll(RegExp(r'\b(a|an|the)\b'), '').replaceAll(RegExp(r'\s+'), ' ').trim();
+    final correctNoArticles = correct.replaceAll(RegExp(r'\b(a|an|the)\b'), '').replaceAll(RegExp(r'\s+'), ' ').trim();
+    setState(() {
+      _answered = true;
+      _isCorrect = userSentence == correct || userNoArticles == correctNoArticles;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: const Color(0xFF88CEFF).withOpacity(0.12),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: const Text('🔀 Word Order',
+              style: TextStyle(fontSize: 13, color: Color(0xFF88CEFF), fontWeight: FontWeight.w500)),
+        ),
+        const SizedBox(height: 16),
+        Text(widget.exercise.question,
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white)),
+        const SizedBox(height: 20),
+        Container(
+          width: double.infinity,
+          constraints: const BoxConstraints(minHeight: 60),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: _answered
+                ? (_isCorrect ? const Color(0xFF2ECC71).withOpacity(0.12) : const Color(0xFFEF5350).withOpacity(0.12))
+                : Colors.white.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: _answered
+                  ? (_isCorrect ? const Color(0xFF2ECC71) : const Color(0xFFEF5350))
+                  : Colors.white.withOpacity(0.1),
+              width: _answered ? 2 : 1,
+            ),
+          ),
+          child: _selectedWords.isEmpty
+              ? Center(child: Text('Tap words below to build your sentence',
+                  style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 14)))
+              : Wrap(
+                  spacing: 8, runSpacing: 8,
+                  children: _selectedWords.asMap().entries.map((entry) {
+                    return GestureDetector(
+                      onTap: () => _tapSelected(entry.key),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF88CEFF).withOpacity(0.18),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: const Color(0xFF88CEFF).withOpacity(0.4)),
+                        ),
+                        child: Text(entry.value,
+                            style: const TextStyle(fontSize: 15, color: Color(0xFF88CEFF), fontWeight: FontWeight.w500)),
+                      ),
+                    );
+                  }).toList(),
+                ),
+        ),
+        const SizedBox(height: 20),
+        if (!_answered) ...[
+          const Text('Available words:',
+              style: TextStyle(fontSize: 13, color: Color(0xFFDDC1AE))),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8, runSpacing: 8,
+            children: _availableWords.asMap().entries.map((entry) {
+              return GestureDetector(
+                onTap: () => _tapAvailable(entry.key),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white.withOpacity(0.2)),
+                  ),
+                  child: Text(entry.value,
+                      style: const TextStyle(fontSize: 15, color: Colors.white)),
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 24),
+          if (_selectedWords.isNotEmpty)
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _checkAnswer,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: themeProvider.primaryColor,
+                  foregroundColor: const Color(0xFF2F1500),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('Check Answer', style: TextStyle(fontSize: 16)),
+              ),
+            ),
+        ],
+        if (_answered) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: _isCorrect ? const Color(0xFF2ECC71).withOpacity(0.12) : const Color(0xFFFF8A00).withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (!_isCorrect) ...[
+                  const Text('Correct sentence:',
+                      style: TextStyle(fontSize: 13, color: Color(0xFFFF8A00), fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Text(widget.exercise.correctSentence ?? '',
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
+                  const SizedBox(height: 8),
+                ],
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.lightbulb,
+                        color: _isCorrect ? const Color(0xFF2ECC71) : const Color(0xFFFF8A00), size: 18),
+                    const SizedBox(width: 6),
+                    Expanded(child: Text(widget.exercise.explanation,
+                        style: const TextStyle(fontSize: 14, color: Color(0xFFDDC1AE)))),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => widget.onComplete(_isCorrect),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: themeProvider.primaryColor,
+                foregroundColor: const Color(0xFF2F1500),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text('Next →', style: TextStyle(fontSize: 16)),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _ResultsScreen extends StatelessWidget {
+  final int correct, total;
+  final Map<String, List<int>> categoryResults;
+  final Map<String, String> typeLabels;
+  final VoidCallback onRestart, onHome;
+
+  const _ResultsScreen({
+    required this.correct, required this.total,
+    required this.categoryResults, required this.typeLabels,
+    required this.onRestart, required this.onHome,
+  });
+
+  String get _emoji {
+    final ratio = correct / total;
+    if (ratio == 1.0) return '🏆';
+    if (ratio >= 0.8) return '🎉';
+    if (ratio >= 0.6) return '👍';
+    return '💪';
+  }
+
+  String get _message {
+    final ratio = correct / total;
+    if (ratio == 1.0) return 'Perfect score!';
+    if (ratio >= 0.8) return 'Great job!';
+    if (ratio >= 0.6) return 'Good effort!';
+    return 'Keep practicing!';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final percent = ((correct / total) * 100).round();
+    final scoreColor = percent >= 70 ? const Color(0xFF2ECC71) : const Color(0xFFFF8A00);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        children: [
+          Text(_emoji, style: const TextStyle(fontSize: 64)),
+          const SizedBox(height: 12),
+          Text(_message,
+              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white)),
+          const SizedBox(height: 8),
+          Text('$correct out of $total correct',
+              style: const TextStyle(fontSize: 18, color: Color(0xFFDDC1AE))),
+          const SizedBox(height: 20),
+          Container(
+            width: 100, height: 100,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: scoreColor.withOpacity(0.12),
+              border: Border.all(color: scoreColor, width: 3),
+            ),
+            child: Center(
+              child: Text('$percent%',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: scoreColor)),
+            ),
+          ),
+          const SizedBox(height: 28),
+          if (categoryResults.isNotEmpty) ...[
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text('By Category',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+            ),
+            const SizedBox(height: 12),
+            ...categoryResults.entries.map((entry) {
+              final counts = entry.value;
+              final catPercent = counts[1] > 0 ? (counts[0] / counts[1] * 100).round() : 0;
+              final color = catPercent >= 70 ? const Color(0xFF2ECC71)
+                  : catPercent >= 50 ? const Color(0xFFFF8A00) : const Color(0xFFEF5350);
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(typeLabels[entry.key] ?? entry.key,
+                            style: const TextStyle(fontSize: 14, color: Colors.white)),
+                        Text('${counts[0]}/${counts[1]} ($catPercent%)',
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: color)),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                      child: FractionallySizedBox(
+                        widthFactor: catPercent / 100,
+                        child: Container(
+                          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+            const SizedBox(height: 16),
+          ],
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: onRestart,
+              icon: const Icon(Icons.refresh),
+              label: const Text('New Session', style: TextStyle(fontSize: 16)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: themeProvider.primaryColor,
+                foregroundColor: const Color(0xFF2F1500),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: onHome,
+              icon: const Icon(Icons.home_outlined),
+              label: const Text('Back to Home', style: TextStyle(fontSize: 16)),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                side: BorderSide(color: Colors.white.withOpacity(0.2)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+const List<String> _gameWords = [
+  'APPLE', 'BRAVE', 'CLOUD', 'DANCE', 'EAGLE',
+  'FLAME', 'GRACE', 'HAPPY', 'IDEAL', 'JOKES',
+  'KNOCK', 'LIGHT', 'MAGIC', 'NOBLE', 'OCEAN',
+  'PEACE', 'QUEEN', 'RIVER', 'SMILE', 'TRUST',
+  'UNITY', 'VIVID', 'WITTY', 'XENON', 'YACHT',
+];
+
+class _MiniGameHub extends StatelessWidget {
+  final bool exercisesReady;
+  final String selectedGame;
+  final ValueChanged<String> onGameSelected;
+  final VoidCallback onExercisesReady;
+
+  const _MiniGameHub({
+    required this.exercisesReady, required this.selectedGame,
+    required this.onGameSelected, required this.onExercisesReady,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (selectedGame == 'falling') {
+      return _FallingLettersGame(exercisesReady: exercisesReady, onExercisesReady: onExercisesReady);
+    }
+    if (selectedGame == 'typing') {
+      return _TypingSpeedGame(exercisesReady: exercisesReady, onExercisesReady: onExercisesReady);
+    }
+    return _GameSelectorScreen(
+      exercisesReady: exercisesReady,
+      onGameSelected: onGameSelected,
+      onExercisesReady: onExercisesReady,
+    );
+  }
+}
+
+class _GameSelectorScreen extends StatelessWidget {
+  final bool exercisesReady;
+  final ValueChanged<String> onGameSelected;
+  final VoidCallback onExercisesReady;
+
+  const _GameSelectorScreen({
+    required this.exercisesReady, required this.onGameSelected, required this.onExercisesReady,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(height: 16),
+          const Text('While you wait...',
+              style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          const Text('Pick a mini-game to play while your exercises are being prepared',
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: Color(0xFFDDC1AE), fontSize: 14)),
+          const SizedBox(height: 32),
+          _GameCard(
+            icon: '🔤',
+            title: 'Falling Letters',
+            description: 'Tap the falling letters in the correct order to spell the word shown. Score points before they run out!',
+            color: themeProvider.primaryColor,
+            onTap: () => onGameSelected('falling'),
+          ),
+          const SizedBox(height: 16),
+          _GameCard(
+            icon: '⌨️',
+            title: 'Typing Speed',
+            description: 'A sentence appears on screen. Type it as accurately and quickly as you can. Track your WPM and accuracy!',
+            color: const Color(0xFF88CEFF),
+            onTap: () => onGameSelected('typing'),
+          ),
+          const SizedBox(height: 32),
+          if (exercisesReady)
+            _ReadyButton(onPressed: onExercisesReady)
+          else
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 14, height: 14,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: themeProvider.primaryColor),
+                ),
+                const SizedBox(width: 10),
+                const Text('Preparing your exercises...', style: TextStyle(color: Colors.white38, fontSize: 13)),
+              ],
+            ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+}
+
+class _GameCard extends StatelessWidget {
+  final String icon, title, description;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _GameCard({
+    required this.icon, required this.title, required this.description,
+    required this.color, required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.04),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withOpacity(0.4), width: 1.5),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 36)),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: TextStyle(color: color, fontSize: 18, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 6),
+                  Text(description, style: const TextStyle(color: Color(0xFFDDC1AE), fontSize: 13, height: 1.5)),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text('Play this →', style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 13)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ReadyButton extends StatefulWidget {
+  final VoidCallback onPressed;
+  const _ReadyButton({required this.onPressed});
+
+  @override
+  State<_ReadyButton> createState() => _ReadyButtonState();
+}
+
+class _ReadyButtonState extends State<_ReadyButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..repeat(reverse: true);
+    _animation = Tween<double>(begin: 0.85, end: 1.0).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() { _controller.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    return ScaleTransition(
+      scale: _animation,
+      child: ElevatedButton(
+        onPressed: widget.onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: themeProvider.primaryColor,
+          foregroundColor: const Color(0xFF2F1500),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        ),
+        child: const Text('Exercises Ready — Tap to Start! 🎯',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+      ),
+    );
+  }
+}
+
+class _TypingSpeedGame extends StatefulWidget {
+  final bool exercisesReady;
+  final VoidCallback onExercisesReady;
+
+  const _TypingSpeedGame({required this.exercisesReady, required this.onExercisesReady});
+
+  @override
+  State<_TypingSpeedGame> createState() => _TypingSpeedGameState();
+}
+
+class _TypingSpeedGameState extends State<_TypingSpeedGame> {
+  static const List<String> _sentences = [
+    'The quick brown fox jumps over the lazy dog.',
+    'Learning a new language opens many doors.',
+    'Practice makes perfect every single day.',
+    'She sells seashells by the seashore.',
+    'A journey of a thousand miles begins with a single step.',
+    'The early bird catches the worm.',
+    'Actions speak louder than words.',
+    'Every cloud has a silver lining.',
+    'Knowledge is the most powerful tool you can have.',
+    'Reading books expands your mind and your vocabulary.',
+    'Hard work and dedication always pay off in the end.',
+    'The best time to learn something new is right now.',
+    'Small steps taken every day lead to big results.',
+    'Confidence grows when you push past your comfort zone.',
+    'A good conversation can change your entire day.',
+    'English is spoken by millions of people around the world.',
+    'Listening carefully is just as important as speaking well.',
+    'Writing regularly helps you become a better communicator.',
+    'Never stop asking questions and seeking new knowledge.',
+    'The more you practice the more natural it becomes.',
+  ];
+
+  final TextEditingController _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+  final Random _random = Random();
+
+  String _currentSentence = '';
+  DateTime? _startTime;
+  int _wpm = 0;
+  int _accuracy = 100;
+  int _bestWpm = 0;
+  int _roundsCompleted = 0;
+  bool _roundComplete = false;
+  String _lastResult = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _nextSentence();
+    _controller.addListener(_onTyping);
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_onTyping);
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _nextSentence() {
+    setState(() {
+      _currentSentence = _sentences[_random.nextInt(_sentences.length)];
+      _startTime = null; _wpm = 0; _accuracy = 100; _roundComplete = false; _lastResult = '';
+    });
+    _controller.clear();
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) _focusNode.requestFocus();
+    });
+  }
+
+  void _onTyping() {
+    if (_roundComplete) return;
+    final typed = _controller.text;
+    if (typed.isEmpty) return;
+    _startTime ??= DateTime.now();
+    int correct = 0;
+    for (int i = 0; i < typed.length && i < _currentSentence.length; i++) {
+      if (typed[i] == _currentSentence[i]) correct++;
+    }
+    final acc = typed.isEmpty ? 100 : ((correct / typed.length) * 100).round();
+    final elapsed = DateTime.now().difference(_startTime!).inSeconds;
+    final words = typed.trim().split(' ').length;
+    final currentWpm = elapsed > 0 ? ((words / elapsed) * 60).round() : 0;
+    setState(() { _accuracy = acc; _wpm = currentWpm; });
+    if (typed == _currentSentence) {
+      final finalWpm = elapsed > 0 ? (((_currentSentence.split(' ').length) / elapsed) * 60).round() : 0;
+      setState(() {
+        _roundComplete = true; _roundsCompleted++;
+        _wpm = finalWpm; _accuracy = acc;
+        if (finalWpm > _bestWpm) _bestWpm = finalWpm;
+        _lastResult = '$finalWpm WPM · $acc% accuracy';
+      });
+      Future.delayed(const Duration(milliseconds: 1800), () {
+        if (mounted) _nextSentence();
+      });
+    }
+  }
+
+  List<TextSpan> _buildTextSpans() {
+    final typed = _controller.text;
+    final spans = <TextSpan>[];
+    for (int i = 0; i < _currentSentence.length; i++) {
+      if (i < typed.length) {
+        final correct = typed[i] == _currentSentence[i];
+        spans.add(TextSpan(
+          text: _currentSentence[i],
+          style: TextStyle(
+            color: correct ? const Color(0xFF2ECC71) : const Color(0xFFEF5350),
+            backgroundColor: correct ? const Color(0xFF2ECC71).withOpacity(0.1) : const Color(0xFFEF5350).withOpacity(0.15),
+            fontSize: 18, height: 1.6,
+          ),
+        ));
+      } else if (i == typed.length) {
+        spans.add(TextSpan(
+          text: _currentSentence[i],
+          style: const TextStyle(
+            color: Colors.white, fontSize: 18, height: 1.6,
+            decoration: TextDecoration.underline, decorationColor: Color(0xFF2ECC71),
+          ),
+        ));
+      } else {
+        spans.add(TextSpan(
+          text: _currentSentence[i],
+          style: const TextStyle(color: Colors.white38, fontSize: 18, height: 1.6),
+        ));
+      }
+    }
+    return spans;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _StatChip(label: 'WPM', value: '$_wpm', color: const Color(0xFF88CEFF)),
+              _StatChip(
+                label: 'Accuracy', value: '$_accuracy%',
+                color: _accuracy >= 90 ? const Color(0xFF2ECC71) : _accuracy >= 70 ? const Color(0xFFFF8A00) : const Color(0xFFEF5350),
+              ),
+              _StatChip(label: 'Best', value: '$_bestWpm', color: const Color(0xFFFFD700)),
+              _StatChip(label: 'Done', value: '$_roundsCompleted', color: const Color(0xFFDDC1AE)),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _roundComplete ? const Color(0xFF2ECC71).withOpacity(0.6) : Colors.white.withOpacity(0.1),
+              ),
+            ),
+            child: RichText(text: TextSpan(children: _buildTextSpans())),
+          ),
+          const SizedBox(height: 16),
+          if (_roundComplete) ...[
+            Text('✅ $_lastResult',
+                style: const TextStyle(color: Color(0xFF2ECC71), fontWeight: FontWeight.bold, fontSize: 14)),
+            const SizedBox(height: 8),
+            const Text('Next sentence loading...', style: TextStyle(color: Colors.white38, fontSize: 12)),
+            const SizedBox(height: 12),
+          ],
+          TextField(
+            controller: _controller,
+            focusNode: _focusNode,
+            enabled: !_roundComplete,
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+            decoration: InputDecoration(
+              hintText: _startTime == null ? 'Start typing to begin...' : 'Keep going!',
+              hintStyle: const TextStyle(color: Colors.white38),
+              filled: true,
+              fillColor: Colors.white.withOpacity(0.05),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.1))),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.1))),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF88CEFF), width: 1.5)),
+            ),
+            onTap: () {
+              if (_startTime == null && _controller.text.isEmpty) setState(() => _startTime = DateTime.now());
+            },
+          ),
+          const SizedBox(height: 8),
+          const Text('Type the sentence above exactly as shown', style: TextStyle(color: Colors.white38, fontSize: 12)),
+          const SizedBox(height: 24),
+          if (widget.exercisesReady)
+            _ReadyButton(onPressed: widget.onExercisesReady)
+          else
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: themeProvider.primaryColor)),
+                const SizedBox(width: 10),
+                const Text('Preparing your exercises...', style: TextStyle(color: Colors.white38, fontSize: 13)),
+              ],
+            ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatChip extends StatelessWidget {
+  final String label, value;
+  final Color color;
+
+  const _StatChip({required this.label, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          Text(value, style: TextStyle(color: color, fontSize: 20, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 2),
+          Text(label, style: const TextStyle(color: Color(0xFFDDC1AE), fontSize: 11)),
+        ],
+      ),
+    );
+  }
+}
+
+class _FallingLettersGame extends StatefulWidget {
+  final VoidCallback? onExercisesReady;
+  final bool exercisesReady;
+
+  const _FallingLettersGame({required this.exercisesReady, this.onExercisesReady});
+
+  @override
+  State<_FallingLettersGame> createState() => _FallingLettersGameState();
+}
+
+class _FallingLettersGameState extends State<_FallingLettersGame> {
+  final Random _random = Random();
+  String _currentWord = '';
+  List<String> _shuffledLetters = [];
+  List<String> _userAnswer = [];
+  int _score = 0;
+  bool _wordComplete = false;
+  String _feedback = '';
+
+  @override
+  void initState() { super.initState(); _nextWord(); }
+
+  void _nextWord() {
+    final word = _gameWords[_random.nextInt(_gameWords.length)];
+    setState(() {
+      _currentWord = word;
+      _shuffledLetters = word.split('')..shuffle();
+      _userAnswer = []; _wordComplete = false; _feedback = '';
+    });
+  }
+
+  void _onLetterTap(String letter, int index) {
+    if (_wordComplete || index < 0 || index >= _shuffledLetters.length) return;
+    setState(() { _userAnswer.add(letter); _shuffledLetters.removeAt(index); });
+    final answer = _userAnswer.join('');
+    if (answer == _currentWord) {
+      setState(() { _score++; _feedback = 'correct'; _wordComplete = true; });
+      Future.delayed(const Duration(milliseconds: 1200), () { if (mounted) _nextWord(); });
+      return;
+    }
+    if (_userAnswer.length == _currentWord.length) {
+      setState(() { _feedback = 'wrong'; _wordComplete = true; });
+      Future.delayed(const Duration(milliseconds: 1000), () { if (mounted) _nextWord(); });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (widget.exercisesReady) ...[
+          _ReadyButton(onPressed: widget.onExercisesReady!),
+          const SizedBox(height: 16),
+        ],
+        const Text('Spell the word while you wait!', style: TextStyle(color: Colors.white38, fontSize: 13)),
+        const SizedBox(height: 8),
+        Text('Score: $_score ⭐',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: themeProvider.primaryColor)),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 10, runSpacing: 10, alignment: WrapAlignment.center,
+          children: _shuffledLetters.asMap().entries.map((entry) {
+            return GestureDetector(
+              onTap: () => _onLetterTap(entry.value, entry.key),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                child: Container(
+                  width: 48, height: 56,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: _wordComplete ? Colors.white.withOpacity(0.1) : themeProvider.primaryColor,
+                  ),
+                  child: Center(
+                    child: Text(entry.value,
+                        style: const TextStyle(color: Color(0xFF2F1500), fontWeight: FontWeight.bold, fontSize: 20)),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: _userAnswer.isEmpty
+              ? [const Text('Tap letters to spell!', style: TextStyle(color: Colors.white38, fontSize: 12))]
+              : _userAnswer.map((letter) {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: 36, height: 36,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: _feedback == 'correct' ? const Color(0xFF2ECC71)
+                          : _feedback == 'wrong' ? const Color(0xFFEF5350)
+                          : const Color(0xFF88CEFF).withOpacity(0.18),
+                    ),
+                    child: Center(
+                      child: Text(letter,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16,
+                              color: _feedback.isNotEmpty ? Colors.white : const Color(0xFF88CEFF))),
+                    ),
+                  );
+                }).toList(),
+        ),
+        const SizedBox(height: 12),
+        if (_feedback == 'correct')
+          const Text('✅ Correct! +1', style: TextStyle(color: Color(0xFF2ECC71), fontWeight: FontWeight.bold))
+        else if (_feedback == 'wrong')
+          const Text('❌ Try again!', style: TextStyle(color: Color(0xFFEF5350), fontWeight: FontWeight.bold))
+        else
+          const SizedBox(height: 20),
+        const SizedBox(height: 16),
+        const Text('💡 Your exercises are being prepared...', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white38, fontSize: 12)),
+        if (widget.exercisesReady)
+          const Text('✅ Ready! Tap the button above.', style: TextStyle(color: Color(0xFF2ECC71), fontSize: 12)),
+      ],
+    );
+  }
+}
